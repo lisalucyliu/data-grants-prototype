@@ -1,0 +1,1706 @@
+/* AWS Data Exchange — Data Grants Prototype
+   Styled with current Cloudscape Design System tokens (cloudscape.design) */
+
+:root {
+  /* Color tokens (sampled from live Cloudscape site) */
+  --color-text-heading: #0f141a;
+  --color-text-body: #16191f;
+  --color-text-body-secondary: #424650;
+  --color-text-body-tertiary: #656871;
+  --color-text-disabled: #b4b4bb;
+  --color-text-link: #006ce0;
+  --color-text-link-hover: #002b66;
+  --color-text-inverted: #f9f9fa;
+  --color-text-inverted-secondary: #c6c6cd;
+
+  /* Verified 2026-08 against cloudscape.design/examples/react/table.html and
+     dashboard.html via computed-style inspection of the live site: the page
+     canvas and full-page table sections share the same near-white #fcfcfd —
+     there is no grey-canvas/white-card split. Only "default" variant
+     Containers (e.g. dashboard widgets) are pure white with a visible
+     #c6c6cd border and 16px radius; full-page table sections have none. */
+  --color-bg-layout: #fcfcfd;
+  --color-bg-container: #ffffff;
+  --color-bg-header: #161d26;
+  --color-bg-header-hover: #232b36;
+  --color-bg-input: #ffffff;
+  --color-bg-table-header: #fcfcfd;
+  --color-bg-row-hover: #f2fbff;
+  --color-bg-row-selected: #f0fbff;
+
+  --color-border: #dedee3;
+  --color-border-strong: #c6c6cd;
+  --color-border-divider: #ebebf0;
+  --color-container-border: #c6c6cd;
+
+  --color-blue: #006ce0;
+  --color-blue-dark: #004a9e;
+  --color-blue-tint: #f0fbff;
+
+  --color-green: #00802f;
+  --color-green-tint: #effff1;
+  --color-green-border: #b5e8bf;
+
+  --color-red: #db0000;
+  --color-red-tint: #fff5f5;
+  --color-red-border: #ffcfcf;
+
+  --color-amber-text: #855900;
+  --color-amber-tint: #fffef0;
+  --color-amber-icon: #866300;
+
+  --color-grey-text: #656871;
+
+  /* "Amazon Ember" is AWS's internal console font and isn't served by the
+     public cloudscape.design site itself — it ships Open Sans as the real
+     typeface. Listed first here as a progressive enhancement for anyone
+     with it installed locally; the fallback chain matches the live site
+     exactly so rendered output is identical for everyone else. */
+  --font-family: "Amazon Ember", "Open Sans", "Helvetica Neue", Roboto, Arial, sans-serif;
+
+  --radius-button: 20px;
+  --radius-input: 8px;
+  --radius-panel: 16px;
+  --radius-badge: 999px;
+
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-s: 12px;
+  --space-m: 16px;
+  --space-l: 20px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--color-text-body);
+  background: var(--color-bg-layout);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-text-link-hover);
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* inline-block (not block): inside a flex container this behaves
+   identically to block (flex items ignore their own inline/block distinction),
+   but it also lets an icon flow correctly inline within prose text — e.g. an
+   external-link icon glued to the end of a link — without wrapping onto its
+   own line the way a block-level child always would. Verified against every
+   existing flex-based icon usage in this file with no regressions. */
+svg {
+  display: inline-block;
+  vertical-align: -2px;
+  flex-shrink: 0;
+}
+
+/* ============ TOP HEADER ============
+   42px tall, per explicit spec: logo, 9-square Services icon, wide search
+   box (5-6px vertical margin), then icon/divider/icon/divider/region/
+   divider/user. */
+
+.top-header {
+  height: 42px;
+  background: var(--color-bg-header);
+  color: var(--color-text-inverted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 0 var(--space-m);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.top-header__logo {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.top-header__logo svg {
+  flex-shrink: 0;
+}
+
+.top-header__services {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-inverted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.top-header__services:hover {
+  background: var(--color-bg-header-hover);
+}
+
+.top-header__search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #0f141a;
+  border: 1px solid #424650;
+  border-radius: 4px;
+  padding: 0 var(--space-s);
+  height: 31px;
+  margin: 5px 0;
+  color: var(--color-text-inverted-secondary);
+  gap: var(--space-xs);
+}
+
+.top-header__search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text-inverted);
+  font-size: 14px;
+  flex: 1;
+  font-family: inherit;
+}
+
+.top-header__search input::placeholder {
+  color: #8c8c94;
+}
+
+.top-header__shortcut {
+  font-size: 12px;
+  color: #8c8c94;
+  border: 1px solid #424650;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+.top-header__spacer {
+  flex: 0 0 var(--space-s);
+}
+
+.top-header__icon-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-inverted);
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+
+.top-header__icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* No margin here — .top-header already sets a 12px flex `gap` between every
+   child, so adding the divider's own margin on top of that was double-
+   counting the spacing (24px instead of 12px on each side). */
+.top-header__divider {
+  width: 1px;
+  height: 20px;
+  background: #424650;
+  flex-shrink: 0;
+}
+
+.top-header__region,
+.top-header__user {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--color-text-inverted);
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============ TOOLBAR (breadcrumb panel) ============
+   Cloudscape's AppLayout renders a full-bleed strip directly under the top
+   header — menu toggle + breadcrumbs on the left, a global info trigger on
+   the right — with its own bottom border. The side nav's vertical border
+   begins at that strip's bottom edge, not at the very top, which is what
+   produces the perpendicular join between the two borders. Verified against
+   cloudscape.design/examples/react/table.html. */
+
+.toolbar {
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 0 var(--space-l);
+  background: var(--color-bg-container);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+
+.toolbar__menu-toggle {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Four states, verified against reference screenshots:
+   nav open + no hover  -> filled AWS-blue circle, white icon
+   nav open + hover     -> darker blue circle
+   nav closed + no hover -> no circle, dark icon
+   nav closed + hover    -> grey circle, dark icon */
+.toolbar__menu-circle {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-blue);
+  color: #fff;
+}
+
+.toolbar__menu-toggle:hover .toolbar__menu-circle {
+  background: var(--color-blue-dark);
+}
+
+.toolbar__menu-toggle.is-collapsed .toolbar__menu-circle {
+  background: transparent;
+  color: var(--color-text-body);
+}
+
+.toolbar__menu-toggle.is-collapsed:hover .toolbar__menu-circle {
+  background: var(--color-border-divider);
+}
+
+.toolbar__spacer {
+  flex: 1;
+}
+
+.toolbar__info-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-input);
+  border: none;
+  background: transparent;
+  color: var(--color-text-body-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toolbar__info-btn:hover {
+  background: var(--color-bg-layout);
+}
+
+/* ============ APP LAYOUT ============ */
+
+.app-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: calc(100vh - 42px - 42px);
+  position: relative;
+}
+
+.app-layout.nav-collapsed .side-nav {
+  display: none;
+}
+
+/* ============ SIDE NAV ============
+   Spacing verified pixel-for-pixel against cloudscape.design/examples/react/
+   table.html: nav content inset 20px left / 16px right, nav links sit flush
+   with zero gap between them (28px row height from 4px/8px padding alone),
+   ~8px between the last item of one section and the next section's header,
+   and section headers are 16px/400 weight, not bold. */
+
+.side-nav {
+  width: 280px;
+  height: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: var(--color-bg-container);
+  border-right: 1px solid var(--color-border-strong);
+  padding: var(--space-l) 16px var(--space-xxl) 20px;
+}
+
+.side-nav__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-m);
+  /* Brings the title text inset to 28px from the nav's left edge (20px
+     container padding + 8px here), matching Cloudscape's verified h2
+     header padding — ported from the private-marketplace-prototype's
+     identical fix. */
+  padding-left: 8px;
+}
+
+.side-nav__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.side-nav__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-body-secondary);
+  display: flex;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.side-nav__close:hover {
+  background: var(--color-bg-layout);
+}
+
+/* Zero top margin — verified against cloudscape.design's own reference:
+   there is no explicit gap between one section's last item and the next
+   section's header row; every row in the nav is a uniform 28px tall and
+   that height alone carries the rhythm. Ported from the
+   private-marketplace-prototype's identical fix. */
+/* Item-to-item spacing within a section is carried entirely by each
+   row's own uniform height (no explicit margin) — but section-to-section
+   transitions need to read as a distinct break, so those specifically
+   get an explicit 20px gap instead of the plain row rhythm. */
+.side-nav__section {
+  margin-top: 0;
+}
+
+.side-nav__section:not(:first-child) {
+  margin-top: var(--space-l);
+}
+
+/* This nav is Cloudscape's "Organized with sections" pattern (plain,
+   non-link group headers), not PMP's "Nesting with expandable link
+   groups" (where the header doubles as a real link to its own landing
+   page) — verified against cloudscape.design/patterns/general/
+   service-navigation/side-navigation/#organized-with-sections via
+   computed style: 16px/700 bold heading text in
+   --color-text-heading, not the 16px/400 this previously used. The
+   chevron sits in the same left gutter as PMP's toggle button (absolute,
+   -13px) so the header text still lands at the same 28px inset as every
+   plain nav link below it. */
+.side-nav__section-title {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  color: var(--color-text-heading);
+  cursor: pointer;
+  user-select: none;
+}
+
+.side-nav__section-title:hover {
+  background: var(--color-bg-layout);
+}
+
+/* Positioned from the container's own top edge (padding-top + half the
+   first line's own line-height) rather than 50% of the whole title,
+   which — once a long header like "Subscribed with AWS Marketplace"
+   wraps to 2 lines — would center the icon between both lines instead
+   of against the first one. */
+.side-nav__section-title svg {
+  position: absolute;
+  left: -13px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+  color: var(--color-text-body-secondary);
+}
+
+.side-nav__section.collapsed .side-nav__section-title svg {
+  transform: rotate(-90deg);
+}
+
+.side-nav__section.collapsed .side-nav__items {
+  display: none;
+}
+
+/* Cloudscape's "Organized with sections" pattern (unlike PMP's "Nesting
+   with expandable link groups") does NOT indent items under their
+   section header — verified against cloudscape.design/patterns/general/
+   service-navigation/side-navigation/#organized-with-sections: "Dashboard",
+   "Usage", "API Keys", etc. all sit flush with "Reports and Analytics" /
+   "Security", not indented under them. */
+.side-nav__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-nav__items li {
+  margin: 0;
+}
+
+.side-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: var(--color-text-body-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.side-nav__link:hover {
+  background: var(--color-bg-layout);
+  text-decoration: none;
+}
+
+.side-nav__link.active {
+  color: var(--color-text-link);
+  font-weight: 700;
+}
+
+/* Cloudscape's own guidance explicitly says not to use a badge for "new
+   page" labels — plain bold text only. Verified against
+   cloudscape.design/patterns/general/announcing-new-features/. */
+.side-nav__badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-blue);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.side-nav__divider {
+  border: none;
+  border-top: 1px solid var(--color-border-divider);
+  margin: var(--space-m) 0;
+}
+
+.side-nav__external {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  color: var(--color-text-link);
+  font-size: 14px;
+}
+
+.side-nav__external svg {
+  color: var(--color-text-body-tertiary);
+}
+
+/* ============ MAIN CONTENT ============ */
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  padding: 20px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  min-width: 0;
+}
+
+/* Every segment but the current one keeps its natural width and never
+   wraps — only the final (current-page) segment, which is the one most
+   likely to be long, shrinks and truncates when space runs out. Ported
+   from the private-marketplace-prototype's identical fix. */
+.breadcrumb a,
+.breadcrumb .sep,
+.breadcrumb__ellipsis-trigger {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.breadcrumb a {
+  color: var(--color-text-link);
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.breadcrumb a:hover {
+  color: var(--color-text-link-hover);
+}
+
+.breadcrumb .sep {
+  color: var(--color-text-body-tertiary);
+  display: flex;
+}
+
+.breadcrumb .current {
+  color: var(--color-grey-text);
+  font-weight: 700;
+  min-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumb-wrapper {
+  display: flex;
+  min-width: 0;
+}
+
+.breadcrumb--collapsed {
+  display: none;
+}
+
+/* Matches Cloudscape's own BreadcrumbGroup collapse point (verified by
+   resizing cloudscape.design/examples/react/edit.html down until its
+   breadcrumb switched to the "..." control). */
+@media (max-width: 700px) {
+  .breadcrumb--full {
+    display: none;
+  }
+
+  .breadcrumb--collapsed {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.breadcrumb__ellipsis-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-link);
+  padding: 0;
+}
+
+.breadcrumb__ellipsis-trigger:hover {
+  color: var(--color-text-link-hover);
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  margin-bottom: var(--space-l);
+}
+
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  margin: 0;
+}
+
+.info-link {
+  font-size: 14px;
+  font-weight: 400;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-link);
+}
+
+.info-link:hover {
+  text-decoration: underline;
+}
+
+/* ============ CONTAINER / CREATION STEPS ============ */
+
+/* Cloudscape's "default"-variant Container: solid white, visible 1px
+   #c6c6cd border, 16px radius, no shadow — verified against a dashboard
+   widget on the live site. Used here only for the supplementary creation
+   steps callout, not for primary full-page table sections (see below). */
+.container {
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-container-border);
+  border-radius: var(--radius-panel);
+  margin-bottom: var(--space-l);
+}
+
+.creation-steps {
+  overflow: hidden;
+}
+
+.creation-steps__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-m) var(--space-l);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--color-border-divider);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text-heading);
+}
+
+.creation-steps__header svg {
+  transition: transform 0.15s ease;
+}
+
+.creation-steps.collapsed .creation-steps__header {
+  border-bottom: none;
+}
+
+.creation-steps.collapsed .creation-steps__header svg {
+  transform: rotate(-90deg);
+}
+
+.creation-steps.collapsed .creation-steps__body {
+  display: none;
+}
+
+.creation-steps__body {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-xl) var(--space-l);
+  gap: var(--space-m);
+}
+
+.creation-steps__step {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-s);
+}
+
+.creation-steps__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-heading);
+}
+
+.creation-steps__text {
+  font-size: 14px;
+  color: var(--color-text-body);
+  line-height: 1.5;
+}
+
+.creation-steps__arrow {
+  color: var(--color-border-strong);
+  margin-top: 20px;
+  flex-shrink: 0;
+}
+
+/* ============ TABS ============ */
+
+/* Verified against cloudscape.design/components/tabs/: 16px/700 label text,
+   tight "7px 4px 7px 3px" padding, and a full-width #c6c6cd bottom rule
+   (not the much lighter divider token, which read as "missing"). */
+/* Cloudscape's own computed value is exactly 1px, but on our pages the
+   tabs sit on an open white canvas with no adjacent card border to give
+   the eye contrast, so the same 1px/#c6c6cd line reads as effectively
+   invisible — bumped to 2px (same color) so it reliably reads as a
+   divider without going dark enough to look like a bold rule. Ported
+   from private-marketplace-prototype's identical fix. */
+/* gap:0 (not 16px) — Cloudscape's own <li> tabs sit flush adjacent with
+   zero gap; the visual spacing between labels comes entirely from each
+   button's own small padding plus the vertical divider below, not from
+   a flex gap. Ported from private-marketplace-prototype's identical fix. */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--color-border-strong);
+  margin-bottom: var(--space-l);
+}
+
+/* Padding is 7px/12px/7px/10px, not 7px/4px/7px/3px — Cloudscape splits
+   this across two nested elements (the button keeps 7px/4px/7px/3px, but
+   its wrapping tabs-tab-header-container div adds its own 0/8px/0/7px on
+   top), which our single-element .tab doesn't have a slot for. Folding
+   both layers into one padding here reproduces the same measured
+   14px text-to-divider / 13px divider-to-next-text gap. Ported from
+   private-marketplace-prototype's identical fix. */
+.tab {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-body-secondary);
+  padding: 7px 12px 7px 10px;
+}
+
+.tab.active {
+  color: var(--color-text-heading);
+}
+
+/* The vertical divider between adjacent tabs — verified against
+   cloudscape.design's own tabs-tab-header-container::before rule
+   (border-inline-end: 1px solid #c6c6cd, inset 8px top/bottom). Every
+   tab except the last one gets it, since there's nothing to divide from
+   after the final tab. Ported from private-marketplace-prototype's
+   identical fix. */
+.tab:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: 0;
+  border-right: 1px solid var(--color-border-strong);
+}
+
+/* The active indicator is its own rounded-cap pill (::after), not a
+   border — verified against cloudscape.design's own tab markup, which
+   uses a 4px bar with a full 20px border-radius on every corner rather
+   than a hard-edged border-bottom. The rounded ends are what keep a bar
+   this tall from reading as "too thick": a sharp-cornered rectangle at
+   the same height looks visibly heavier than a pill does. Ported from
+   private-marketplace-prototype's identical fix. */
+.tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 4px;
+  background: var(--color-blue);
+  border-radius: 20px;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ============ TABLE PANEL ============ */
+
+/* Verified on the live "table view" / "table property filter" demos: the
+   primary full-page table section carries no border, background fill, or
+   shadow of its own — it sits flush on the page canvas (both #fcfcfd) and
+   is separated purely by whitespace and the table's own row hairlines. */
+.table-panel {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.table-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-m);
+  margin-bottom: var(--space-m);
+}
+
+.table-panel__title-group h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--color-text-heading);
+}
+
+.table-panel__count {
+  font-weight: 400;
+  color: var(--color-text-body-secondary);
+}
+
+.table-panel__subtitle {
+  font-size: 14px;
+  color: var(--color-text-body-secondary);
+  margin: 0;
+}
+
+.table-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  flex-shrink: 0;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-body);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle__track {
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--color-border-strong);
+  position: relative;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+
+.toggle input:checked + .toggle__track {
+  background: var(--color-blue);
+}
+
+.toggle input:checked + .toggle__track::after {
+  transform: translateX(16px);
+}
+
+/* Buttons */
+
+.btn {
+  height: 32px;
+  padding: 0 var(--space-l);
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 2px solid transparent;
+}
+
+/* Manual-refresh button: 32px circle, blue border + blue icon on white —
+   verified against cloudscape.design/patterns/general/loading-and-refreshing/ */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--color-blue);
+  background: var(--color-bg-container);
+  color: var(--color-blue);
+}
+
+.btn-icon:hover {
+  background: var(--color-bg-layout);
+  color: var(--color-blue);
+}
+
+/* When a .btn is an <a>, the generic `a:hover` rule elsewhere in this file
+   has higher specificity than a plain `.btn-primary`/`.btn-normal` color
+   declaration, so hovering would otherwise silently repaint the label with
+   the link-hover color and underline it — verified against
+   cloudscape.design/components/button/, where a primary button's hover
+   only darkens the fill; the label stays put. Restated per variant below
+   so this can't regress the same way. */
+.btn:hover {
+  text-decoration: none;
+}
+
+/* Normal/secondary button border is AWS blue, not grey — verified against
+   the "with action buttons" table example on cloudscape.design. */
+.btn-normal {
+  background: var(--color-bg-container);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.btn-normal:hover {
+  background: var(--color-bg-layout);
+  color: var(--color-blue);
+}
+
+.btn-normal:disabled {
+  color: var(--color-text-body-tertiary);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+  background: var(--color-bg-layout);
+}
+
+.btn-primary {
+  background: var(--color-blue);
+  border-color: var(--color-blue);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-blue-dark);
+  border-color: var(--color-blue-dark);
+  color: #fff;
+}
+
+.btn-primary:disabled {
+  background: #d9d9de;
+  border-color: #d9d9de;
+  color: #8c8c94;
+  cursor: not-allowed;
+}
+
+.btn-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: 0 4px 20px rgba(15, 20, 26, 0.15);
+  min-width: 180px;
+  padding: 4px;
+  z-index: 20;
+  display: none;
+}
+
+.dropdown-menu.open {
+  display: block;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-body);
+}
+
+.dropdown-menu button:hover {
+  background: var(--color-bg-layout);
+}
+
+.dropdown-menu a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-body);
+  text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+  background: var(--color-bg-layout);
+}
+
+.dropdown-menu button:disabled {
+  color: var(--color-text-body-tertiary);
+  cursor: not-allowed;
+}
+
+/* Search + pagination row */
+
+/* Verified against cloudscape.design/components/table/ (common-table
+   example, viewed at full desktop width — a narrow embedded preview frame
+   understates this): search and pagination share one row; flex-wrap only
+   drops pagination to its own row once the row runs out of horizontal
+   space (mobile width), never before. */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  margin-bottom: var(--space-m);
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-input);
+  padding: 0 var(--space-s);
+  color: var(--color-text-body-tertiary);
+  background: var(--color-bg-input);
+}
+
+.search-input input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text-body);
+  background: transparent;
+}
+
+.search-input svg {
+  flex-shrink: 0;
+  color: var(--color-text-body-tertiary);
+}
+
+/* Verified against cloudscape.design/components/pagination/: page-number
+   buttons are plain text (no box/pill), 20x24, current page is bold
+   near-black, others grey, disabled lighter grey. Hover only darkens text —
+   no background. The preferences trigger is a separate borderless icon
+   button (20px gap from the pagination group) that only darkens on hover. */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.page-btn {
+  box-sizing: border-box;
+  width: 20px;
+  height: 24px;
+  border: 2px solid transparent;
+  background: none;
+  border-radius: 0;
+  cursor: pointer;
+  color: var(--color-text-body-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.page-btn:hover:not(:disabled) {
+  color: var(--color-text-heading);
+}
+
+.page-btn:disabled {
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+.page-btn.current {
+  color: var(--color-text-heading);
+  font-weight: 700;
+}
+
+/* Divider drawn as a ::before rather than a border on the button itself —
+   the button's own border-radius:20px pill shape would clip a real
+   border-left into a curved sliver instead of a straight line. Verified
+   pixel-for-pixel against cloudscape.design/examples/react/table.html.
+   Ported from private-marketplace-prototype's identical fix. */
+.page-settings {
+  position: relative;
+  margin-left: 17px;
+  width: 28px;
+  height: 32px;
+  border: none;
+  border-radius: 20px;
+  background: none;
+  color: var(--color-text-body-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.page-settings::before {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--color-border-strong);
+}
+
+.page-settings:hover {
+  color: var(--color-text-heading);
+}
+
+/* Table — no wrapping border/radius: on the live full-page table demos the
+   table sits directly on the page canvas, structured only by row hairlines. */
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* border-collapse:separate + border-spacing:0 is the verified live-
+   Cloudscape recipe — it lets each cell own an independent border (needed
+   for per-cell selection radius) without the collapsed-border merging that
+   caused row selection to shift the whole table by 1px, and without
+   changing row height when a cell's border color/width changes on
+   selection (verified directly against the live table: selecting a row
+   does not move any other row by even 1px). table-layout stays auto since
+   our columns rely on content-based sizing, not the live demo's fixed
+   layout. */
+table.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.data-table thead th {
+  position: relative;
+  background: var(--color-bg-table-header);
+  color: var(--color-text-body-secondary);
+  font-weight: 700;
+  text-align: left;
+  padding: 9px 20px;
+  border-bottom: 1px solid var(--color-border-divider);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* The vertical divider between header cells — Cloudscape renders it as
+   an actual <span class="divider"> sibling inside every th but the last
+   one, with a 1px #c6c6cd border-inline-start inset ~9px top/bottom.
+   We don't have that sibling span, so a ::after pseudo-element
+   reproduces the same measured inset instead. Ported from
+   private-marketplace-prototype's identical fix. */
+.data-table thead th:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  bottom: 9px;
+  right: 0;
+  border-right: 1px solid var(--color-border-strong);
+}
+
+.data-table thead th.no-sort {
+  cursor: default;
+}
+
+/* The active sort column's icon (sortAsc/sortDesc) is solid-filled,
+   unlike the hollow sortNeutral icon every other sortable column shows —
+   both use currentColor, so darkening the whole header's text color to
+   match cloudscape.design's own active-sort color is enough to recolor
+   the icon too. Ported from private-marketplace-prototype's identical
+   fix. */
+.data-table thead th.sorted {
+  color: var(--color-text-heading);
+}
+
+.data-table thead th .th-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.data-table thead th svg {
+  flex-shrink: 0;
+}
+
+/* Every cell always reserves the same border widths it would have when
+   selected (1px top / 1px bottom / 2px left+right on edge columns) —
+   selection only ever changes color, never width, which is what makes the
+   live Cloudscape table immune to any layout shift on selection. */
+.data-table tbody td {
+  padding: 9px 20px;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid var(--color-border-divider);
+  color: var(--color-text-body);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Table cell links are always underlined, unlike nav/button links which
+   only underline on hover. */
+.data-table tbody td a {
+  text-decoration: underline;
+}
+
+.data-table tbody td:first-child {
+  border-left: 2px solid transparent;
+}
+
+.data-table tbody td:last-child {
+  border-right: 2px solid transparent;
+}
+
+/* Two tables sharing one card, separated by a divider (e.g. "All products"
+   above "Selected products"): the top table's last row already draws its
+   own bottom border, which doubles up visually right next to the divider
+   below it. Suppress it (unless that row is selected, which still needs
+   its blue border) so only the divider's single line shows between the
+   two tables. */
+div:has(+ hr.side-nav__divider) .data-table tbody tr:last-child:not(.selected) td {
+  border-bottom-color: transparent;
+}
+
+.data-table th.checkbox-col,
+.data-table th.radio-col,
+.data-table td.checkbox-col,
+.data-table td.radio-col {
+  padding: 1px;
+  text-align: center;
+}
+
+/* Verified against cloudscape.design/components/table/?example=simple:
+   a table with no selection column has its first column's cell edge
+   (not just its text) land flush with the card's own title above it —
+   apply .simple to any <table class="data-table"> that has no checkbox-
+   or radio-col. Ported from private-marketplace-prototype. */
+.data-table.simple thead th:first-child,
+.data-table.simple tbody td:first-child {
+  padding-left: 0;
+}
+
+.data-table tbody td.wrap-col {
+  white-space: normal;
+  max-width: 320px;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-bg-row-hover);
+}
+
+/* Selected row: verified against the live table — border-color switches to
+   blue and border-top/bottom-width switches 1px->2px (Cloudscape's own
+   selected cells measure the same way and still don't shift the table).
+   Corner radius is conditional: a row only rounds an edge that isn't
+   shared with an equally-selected neighbor, so a contiguous block of
+   selected rows rounds only its outer corners, matching the live table. */
+.data-table tbody tr.selected {
+  background: var(--color-bg-row-selected);
+}
+
+.data-table tbody tr.selected td {
+  border-top-color: var(--color-blue);
+  border-bottom-color: var(--color-blue);
+}
+
+/* With border-collapse:separate every row draws its own border, so at the
+   shared boundary between two contiguously-selected rows the row above's
+   bottom border AND the row below's top border would both render blue,
+   doubling that line to 4px vs. 2px everywhere else. Only the top row
+   "owns" that shared line — the bottom row suppresses its own top border
+   there so exactly one 2px line renders, same as every other edge. */
+.data-table tbody tr.selected:not(.selected--top) td {
+  border-top-color: transparent;
+}
+
+.data-table tbody tr.selected td:first-child {
+  border-left-color: var(--color-blue);
+}
+
+.data-table tbody tr.selected td:last-child {
+  border-right-color: var(--color-blue);
+}
+
+.data-table tbody tr.selected.selected--top td:first-child {
+  border-top-left-radius: 8px;
+}
+
+.data-table tbody tr.selected.selected--top td:last-child {
+  border-top-right-radius: 8px;
+}
+
+.data-table tbody tr.selected.selected--bottom td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.data-table tbody tr.selected.selected--bottom td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+.data-table .checkbox-col,
+.data-table .radio-col {
+  width: 40px;
+  min-width: 40px;
+  box-sizing: border-box;
+}
+
+/* Custom checkbox matching cloudscape.design/components/checkbox/ exactly:
+   16x16, rx 3, 1px #8c8c94 stroke unchecked; solid AWS-blue + white
+   checkmark when checked. Native control hidden via appearance:none. */
+.data-table input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border-radius: 3px;
+  border: 1px solid #8c8c94;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Glyphs are the exact <polyline> shapes cloudscape.design's own checkbox
+   SVG draws in its 16x16 viewBox (points="3.5,8 7,11 12,4" checked;
+   "3.5,8 12.5,8" indeterminate) — reproduced as a background-image so they
+   paint from the input's border-box (its full visible 16x16 footprint),
+   the same coordinate space Cloudscape's own SVG uses, rather than the
+   14x14 content-box a ::after pseudo-element would be confined to. That
+   mismatch was the root cause of the checkmark looking oversized and
+   vertically off-center. Ported from private-marketplace-prototype's
+   identical fix. */
+.data-table input[type="checkbox"]:checked {
+  background: var(--color-blue)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolyline points='3.5,8 7,11 12,4' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E")
+    no-repeat center / 16px 16px;
+  border-color: var(--color-blue);
+}
+
+/* Header "select all" checkbox when some but not all rows are selected —
+   set via JS (input.indeterminate = true), matching the live Cloudscape
+   table's minus-glyph treatment instead of an empty or fully-checked box. */
+.data-table input[type="checkbox"]:indeterminate {
+  background: var(--color-blue)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolyline points='3.5,8 12.5,8' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E")
+    no-repeat center / 16px 16px;
+  border-color: var(--color-blue);
+}
+
+.data-table input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-blue);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.data-table .empty-row td {
+  text-align: center;
+  padding: var(--space-xxl) var(--space-m);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  color: var(--color-text-body-secondary);
+}
+
+/* status badges */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.status svg {
+  flex-shrink: 0;
+}
+
+.status--pending {
+  color: var(--color-grey-text);
+}
+
+.status--accepted {
+  color: var(--color-green);
+}
+
+.status--expired {
+  color: var(--color-amber-text);
+}
+
+.status--processing {
+  color: var(--color-text-body-secondary);
+}
+
+.status--completed {
+  color: var(--color-green);
+}
+
+.spin {
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============ FLASHBAR / ALERT ============ */
+
+.flashbar {
+  margin-bottom: var(--space-m);
+}
+
+/* No flash showing: the div is still in the layout (so a flash can be
+   prepended into it later) but shouldn't reserve its margin — otherwise
+   every page shows a dead gap between the breadcrumbs and the page header. */
+.flashbar:empty {
+  margin-bottom: 0;
+}
+
+/* Verified against cloudscape.design/components/flashbar/: 12px radius,
+   "8px 16px" padding, white icon/text on info/success/error, but dark
+   text+icon on the yellow warning variant for contrast. */
+.flash {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: 8px 16px;
+  border-radius: 12px;
+  color: #f9f9fa;
+  font-size: 14px;
+  margin-bottom: var(--space-s);
+  min-height: 32px;
+}
+
+.flash svg {
+  flex-shrink: 0;
+}
+
+.flash__content {
+  flex: 1;
+}
+
+.flash__action {
+  height: 32px;
+  padding: 0 20px;
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  border: 2px solid currentColor;
+  color: inherit;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.flash__action:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.flash__dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.85;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.flash__dismiss:hover {
+  opacity: 1;
+}
+
+.flash--info {
+  background: var(--color-blue);
+}
+
+.flash--success {
+  background: var(--color-green);
+}
+
+.flash--error {
+  background: var(--color-red);
+}
+
+.flash--warning {
+  background: #ffe347;
+  color: #0f141a;
+}
+
+.flash--in-progress {
+  background: var(--color-blue);
+}
+
+/* ============ HELP PANEL (right side drawer) ============ */
+
+.help-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 26, 0.3);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.help-panel-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.help-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  background: var(--color-bg-container);
+  box-shadow: -4px 0 20px rgba(15, 20, 26, 0.2);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.help-panel.open {
+  transform: translateX(0);
+}
+
+.help-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-l);
+  border-bottom: 1px solid var(--color-border-divider);
+}
+
+.help-panel__header h2 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--color-text-heading);
+}
+
+.help-panel__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-body-secondary);
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.help-panel__close:hover {
+  background: var(--color-bg-layout);
+}
+
+.help-panel__body {
+  padding: var(--space-l);
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-body);
+}
+
+.help-panel__body h3 {
+  font-size: 14px;
+  color: var(--color-text-heading);
+  margin: var(--space-l) 0 var(--space-xs);
+}
+
+.help-panel__body h3:first-child {
+  margin-top: 0;
+}
+
+.help-panel__body ul {
+  margin: 0 0 var(--space-m);
+  padding-left: 18px;
+}
+
+.help-panel__body li {
+  margin-bottom: 6px;
+}
+
+.help-panel__links {
+  margin-top: var(--space-l);
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--color-border-divider);
+}
+
+.help-panel__links h3 {
+  margin-top: 0;
+}
+
+.help-panel__links a {
+  display: block;
+  margin-bottom: var(--space-xs);
+}
+
+/* ============ FOOTER ============ */
+
+.app-footer {
+  background: var(--color-bg-header);
+  color: var(--color-text-inverted-secondary);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-s) var(--space-xl);
+}
+
+.app-footer a {
+  color: var(--color-text-inverted-secondary);
+  margin-left: var(--space-m);
+}
+
+.app-footer a:hover {
+  color: #fff;
+}
+
+/* Truncated cell text */
+.truncate {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+@media (max-width: 900px) {
+  .side-nav {
+    display: none;
+  }
+  .creation-steps__body {
+    flex-direction: column;
+  }
+  .creation-steps__arrow {
+    transform: rotate(90deg);
+    margin: 0;
+  }
+}
