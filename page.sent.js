@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <h3>Learn more&nbsp;${Icons.externalLink}</h3>
       <a href="https://docs.aws.amazon.com/data-exchange/latest/userguide/creating-data-grants.html" target="_blank" rel="noopener">Creating data grants</a>
       <a href="https://docs.aws.amazon.com/data-exchange/latest/userguide/what-is.html" target="_blank" rel="noopener">AWS Data Exchange user guide</a>
+      <a href="https://grounded-answers-beryl.vercel.app" target="_blank" rel="noopener">Ask AWS Docs AI (Grounded Answers prototype)</a>
     </div>
     `
   );
